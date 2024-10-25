@@ -89,23 +89,32 @@ int calcularSumaPixeles(int *imagen, int width, int height) {
 }
 
 void aplicarFiltro(int *imagen, int *imagenProcesada, int width, int height) {
-    int Gx[3][3] = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
-    int Gy[3][3] = {{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}};
+    // Definición de las máscaras de Sobel para el cálculo del gradiente en las direcciones X e Y
+    int Gx[3][3] = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}}; // Máscara para detección de bordes en la dirección X
+    int Gy[3][3] = {{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}}; // Máscara para detección de bordes en la dirección Y
 
+    // Bucle que recorre cada píxel de la imagen, evitando los bordes
     for (int y = 1; y < height - 1; y++) {
         for (int x = 1; x < width - 1; x++) {
+            // Inicialización de las sumas para los gradientes en X e Y
             int sumX = 0;
             int sumY = 0;
 
-            for (int ky = -1; ky <= 1; ky++) {
-                for (int kx = -1; kx <= 1; kx++) {
+            // Aplicación de las máscaras de Sobel en la vecindad de 3x3 alrededor del píxel actual
+            for (int ky = -1; ky <= 1; ky++) { // Iteración sobre la altura de la máscara
+                for (int kx = -1; kx <= 1; kx++) { // Iteración sobre el ancho de la máscara
+                    // Cálculo de la suma del gradiente en la dirección X
                     sumX += imagen[(y + ky) * width + (x + kx)] * Gx[ky + 1][kx + 1];
+                    // Cálculo de la suma del gradiente en la dirección Y
                     sumY += imagen[(y + ky) * width + (x + kx)] * Gy[ky + 1][kx + 1];
                 }
             }
 
+            // Cálculo de la magnitud del gradiente combinando ambas direcciones
             int magnitude = abs(sumX) + abs(sumY);
+            // Normalización de la magnitud del gradiente para asegurarse de que esté en el rango de 0 a 255
             imagenProcesada[y * width + x] = (magnitude > 255) ? 255 : magnitude;
         }
     }
 }
+
